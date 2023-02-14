@@ -1,3 +1,4 @@
+import json
 import os
 
 from dotenv import load_dotenv
@@ -15,34 +16,86 @@ class Youtube:
     YOUTUBE_API_KEY = os.environ.get('YOUTUBE_API_KEY')
     youtube = build('youtube', 'v3', developerKey=YOUTUBE_API_KEY)
 
+    @staticmethod
+    def get_chanel(channel_id):
+        channel = Youtube.youtube.channels().list(id=channel_id, part='snippet,statistics').execute()
+        return channel
+
 
 class Channel:
     """
     Базовый класс, описывающий YouTube канал
     Attrs:
-        channel_id (str): id YouTube канала
+        channel_id: id YouTube канала
     """
 
-    def __init__(self, channel_id):
+    def __init__(self, channel_id=None, channel_json=None):
+        if channel_id is not None:
+            self.__channel_info = Youtube.get_chanel(channel_id=channel_id)
+        elif channel_json is not None:
+            with open(channel_json, 'r') as file:
+                data = file.read()
+                self.__channel_info = json.loads(data)
+        else:
+            raise Exception('Illegal arguments')
+
         self.__channel_id = channel_id
+        self.__title = self.title
+        self.__description = self.description
+        self.__link = self.link
+        self.__subscriber_count = self.subscriber_count
+        self.__video_count = self.video_count
+        self.__view_count = self.view_count
 
     def __repr__(self):
         return repr(f'Channel(channel_id={self.__channel_id})')
 
     def __str__(self):
-        return f'YouTube channel {self.get_channel_title()} id={self.__channel_id}'
+        return f'YouTube channel {self.__title} id={self.__channel_id}'
 
-    def get_channel(self) -> dict:
-        """Возвращает информацию о канале"""
-        channel = Youtube.youtube.channels().list(id=self.__channel_id, part='snippet,statistics').execute()
-        return channel
-
-    def get_channel_title(self) -> str:
+    @property
+    def title(self) -> str:
         """Возвращает название канала"""
-        channel = self.get_channel()
-        channel_title = channel.get('items')[0].get('snippet').get('title')
+        channel_title = self.__channel_info.get('items')[0].get('snippet').get('title')
         return channel_title
+
+    @property
+    def description(self) -> str:
+        """Возвращает описание канала"""
+        channel_description = self.__channel_info.get('items')[0].get('snippet').get('description')
+        return channel_description
+
+    @property
+    def link(self) -> str:
+        """Возвращает ссылку на канал"""
+        channel_link = self.__channel_info.get('items')[0].get('snippet').get('customURL')
+        return channel_link
+
+    @property
+    def subscriber_count(self) -> str:
+        """Возвращает количество подписчиков"""
+        channel_subscriber = self.__channel_info.get('items')[0].get('statistics').get('subscriberCount')
+        return channel_subscriber
+
+    @property
+    def video_count(self) -> str:
+        """Возвращает количество видео"""
+        channel_video = self.__channel_info.get('items')[0].get('statistics').get('videoCount')
+        return channel_video
+
+    @property
+    def view_count(self) -> str:
+        """Возвращает количество просмотров"""
+        channel_view = self.__channel_info.get('items')[0].get('statistics').get('viewCount')
+        return channel_view
 
     def print_info(self) -> None:
         """Выводит на экран информацию о канале"""
-        print(self.get_channel())
+        print(self.__channel_info)
+
+    def to_json(self) -> None:
+        """
+        Сохраняет имеющуюся информации по каналу в json-файл
+        """
+        with open(f'{self.__channel_id}.json', 'w', encoding='utf-8') as file:
+            json.dump(self.__channel_info, file, indent='\t')
