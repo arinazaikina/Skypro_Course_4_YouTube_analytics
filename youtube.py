@@ -51,7 +51,7 @@ class Channel:
         return repr(f'Channel(channel_id={self.__channel_id})')
 
     def __str__(self):
-        return f'YouTube channel {self.__title} id={self.__channel_id}'
+        return f'YouTube-канал: {self.__title}'
 
     @property
     def title(self) -> str:
@@ -68,7 +68,7 @@ class Channel:
     @property
     def link(self) -> str:
         """Возвращает ссылку на канал"""
-        channel_link = self.__channel_info.get('items')[0].get('snippet').get('customURL')
+        channel_link = self.__channel_info.get('items')[0].get('snippet').get('customUrl')
         return channel_link
 
     @property
