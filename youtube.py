@@ -48,10 +48,25 @@ class Channel:
         self.__view_count = self.view_count
 
     def __repr__(self):
-        return repr(f'Channel(channel_id={self.__channel_id})')
+        return f'Channel(channel_id={self.__channel_id})'
 
     def __str__(self):
         return f'YouTube-канал: {self.__title}'
+
+    def __len__(self) -> int:
+        """Возвращает количество подписчиков"""
+        return self.__subscriber_count
+
+    def __add__(self, other: 'Channel') -> int:
+        """Сложение количества подписчиков двух каналов"""
+        return self.__subscriber_count + other.__subscriber_count
+
+    def __gt__(self, other: 'Channel') -> bool:
+        """
+        Возвращает True, если количество подписчиков на канале больше, чем на другом канале.
+        Возвращает False, если количество подписчиков на канале меньше, чем на другом канале.
+        """
+        return self.__subscriber_count > other.__subscriber_count
 
     @property
     def title(self) -> str:
@@ -72,22 +87,22 @@ class Channel:
         return channel_link
 
     @property
-    def subscriber_count(self) -> str:
+    def subscriber_count(self) -> int:
         """Возвращает количество подписчиков"""
         channel_subscriber = self.__channel_info.get('items')[0].get('statistics').get('subscriberCount')
-        return channel_subscriber
+        return int(channel_subscriber)
 
     @property
-    def video_count(self) -> str:
+    def video_count(self) -> int:
         """Возвращает количество видео"""
         channel_video = self.__channel_info.get('items')[0].get('statistics').get('videoCount')
-        return channel_video
+        return int(channel_video)
 
     @property
-    def view_count(self) -> str:
+    def view_count(self) -> int:
         """Возвращает количество просмотров"""
         channel_view = self.__channel_info.get('items')[0].get('statistics').get('viewCount')
-        return channel_view
+        return int(channel_view)
 
     def print_info(self) -> None:
         """Выводит на экран информацию о канале"""
