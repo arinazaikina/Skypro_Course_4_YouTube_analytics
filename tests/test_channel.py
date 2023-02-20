@@ -55,8 +55,12 @@ def test_len(channel_1_for_test):
 
 def test_add(channel_1_for_test, channel_2_for_test):
     assert channel_1_for_test + channel_2_for_test == 13980000
+    with pytest.raises(ArithmeticError):
+        result = channel_1_for_test + 10
 
 
 def test_gt(channel_1_for_test, channel_2_for_test):
     assert channel_1_for_test > channel_2_for_test
     assert channel_2_for_test < channel_1_for_test
+    with pytest.raises(TypeError):
+        result = channel_1_for_test > 10

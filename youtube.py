@@ -59,6 +59,8 @@ class Channel:
 
     def __add__(self, other: 'Channel') -> int:
         """Сложение количества подписчиков двух каналов"""
+        if not isinstance(other, Channel):
+            raise ArithmeticError('Правый операнд должен быть объектом Channel')
         return self.__subscriber_count + other.__subscriber_count
 
     def __gt__(self, other: 'Channel') -> bool:
@@ -66,6 +68,8 @@ class Channel:
         Возвращает True, если количество подписчиков на канале больше, чем на другом канале.
         Возвращает False, если количество подписчиков на канале меньше, чем на другом канале.
         """
+        if not isinstance(other, Channel):
+            raise TypeError('Правый операнд должен быть объектом Channel')
         return self.__subscriber_count > other.__subscriber_count
 
     @property
