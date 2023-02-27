@@ -29,7 +29,22 @@ class Channel:
         channel_id: id YouTube канала
     """
 
-    def __init__(self, channel_id=None, channel_json=None):
+    def __init__(self, channel_id=None, channel_json=None) -> None:
+        """
+        Инициализируется по id канала или по пути к файлу json (для тестирования)
+        Во время создания экземпляра инициализируются атрибуты:
+        - channel_info: информация о канале
+        - title: название канала
+        - description: описание канала
+        - link: ссылка на канал
+        - subscriber_count: количество подписчиков
+        - video_count: количество видео
+        - view_count: количество просмотров
+        :param channel_id: id канала на YouTube
+        :type channel_id: str
+        :param channel_json: путь к файлу json с информацией о канала
+        :type channel_json: str
+        """
         if channel_id is not None:
             self.__channel_info = Youtube.get_chanel(channel_id=channel_id)
         elif channel_json is not None:
