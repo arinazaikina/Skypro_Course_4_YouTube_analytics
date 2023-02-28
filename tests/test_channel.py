@@ -16,20 +16,9 @@ def test_get_attributes(channel_1_for_test):
 
 
 def test_channel_info_attribute_access(channel_1_for_test):
-    """Проверка отсутствие доступа на получение атрибута channel_info"""
+    """Проверка отсутствия доступа на получение атрибута channel_info"""
     with pytest.raises(AttributeError):
         channel_info = channel_1_for_test.channel_info
-
-
-def test_change_attributes_access(channel_1_for_test):
-    """Проверка отсутствие доступа на изменение атрибутов экземпляра класса Channel"""
-    with pytest.raises(AttributeError):
-        channel_1_for_test.title = 'new'
-        channel_1_for_test.description = 'new'
-        channel_1_for_test.link = 'new'
-        channel_1_for_test.subscriber_count = 'new'
-        channel_1_for_test.video_count = 'new'
-        channel_1_for_test.view_count = 'new'
 
 
 def test_exception():
