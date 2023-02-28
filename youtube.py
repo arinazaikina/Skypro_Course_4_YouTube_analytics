@@ -1,7 +1,6 @@
 import json
 import os
 
-from dotenv import load_dotenv
 from googleapiclient.discovery import build
 
 
@@ -12,23 +11,23 @@ class Youtube:
         YOUTUBE_API_KEY (str): ключ для работы с API YouTube
         youtube: клиент для работы с API YouTube
     """
-    load_dotenv()
+
     YOUTUBE_API_KEY = os.environ.get('YOUTUBE_API_KEY')
     youtube = build('youtube', 'v3', developerKey=YOUTUBE_API_KEY)
 
-    @staticmethod
-    def get_chanel(channel_id):
-        channel = Youtube.youtube.channels().list(id=channel_id, part='snippet,statistics').execute()
+    @classmethod
+    def get_chanel(cls, channel_id):
+        channel = cls.youtube.channels().list(id=channel_id, part='snippet,statistics').execute()
         return channel
 
-    @staticmethod
-    def get_video(video_id):
-        video = Youtube.youtube.videos().list(id=video_id, part='snippet,statistics').execute()
+    @classmethod
+    def get_video(cls, video_id):
+        video = cls.youtube.videos().list(id=video_id, part='snippet,statistics').execute()
         return video
 
-    @staticmethod
-    def get_video_in_playlist(video_id, playlist_id):
-        video_in_playlist = Youtube.youtube.playlistItems().list(
+    @classmethod
+    def get_video_in_playlist(cls, video_id, playlist_id):
+        video_in_playlist = cls.youtube.playlistItems().list(
             part="snippet", playlistId=playlist_id, videoId=video_id
         ).execute()
         return video_in_playlist
