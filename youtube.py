@@ -16,7 +16,7 @@ class Youtube:
     youtube = build('youtube', 'v3', developerKey=YOUTUBE_API_KEY)
 
     @classmethod
-    def get_chanel(cls, channel_id):
+    def get_channel(cls, channel_id):
         channel = cls.youtube.channels().list(id=channel_id, part='snippet,statistics').execute()
         return channel
 
@@ -57,7 +57,7 @@ class Channel:
         :type channel_json: str
         """
         if channel_id is not None:
-            self.__channel_info = Youtube.get_chanel(channel_id=channel_id)
+            self.__channel_info = Youtube.get_channel(channel_id=channel_id)
         elif channel_json is not None:
             with open(channel_json, 'r') as file:
                 data = file.read()
