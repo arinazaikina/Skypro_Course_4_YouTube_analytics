@@ -1,10 +1,10 @@
 {
 	"kind": "youtube#videoListResponse",
-	"etag": "yGvWhDGvJ8B20N6NocH1xkkL2Uk",
+	"etag": "T-md5e4Q2DD7vplkVVTAnMB-Pz4",
 	"items": [
 		{
 			"kind": "youtube#video",
-			"etag": "1TF6ZuijS8_F_M25GqUdVeXOwrg",
+			"etag": "zzRxsalyWWiVaBlPOyXHEv4Mqgg",
 			"id": "9lO06Zxhu88",
 			"snippet": {
 				"publishedAt": "2020-04-23T16:22:02Z",
@@ -80,11 +80,20 @@
 				},
 				"defaultAudioLanguage": "ru"
 			},
+			"contentDetails": {
+				"duration": "PT3H7M33S",
+				"dimension": "2d",
+				"definition": "hd",
+				"caption": "true",
+				"licensedContent": true,
+				"contentRating": {},
+				"projection": "rectangular"
+			},
 			"statistics": {
-				"viewCount": "49332556",
-				"likeCount": "976161",
+				"viewCount": "49345436",
+				"likeCount": "976215",
 				"favoriteCount": "0",
-				"commentCount": "79525"
+				"commentCount": "79512"
 			}
 		}
 	],
