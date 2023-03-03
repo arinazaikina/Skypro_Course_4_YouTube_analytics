@@ -301,7 +301,6 @@ class PlayList:
         :type playlist_id: str
         :param playlist_json: путь к файлу json с информацией о плейлисте
         :type playlist_json: str
-        :param video_jsons: список путей к файлам json с информацией о видео (для тестирования)
     """
 
     def __init__(self, playlist_id=None, playlist_json=None) -> None:
