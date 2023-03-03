@@ -1,7 +1,6 @@
 import json
 import os
 
-from dotenv import load_dotenv
 from googleapiclient.discovery import build
 
 
@@ -12,14 +11,26 @@ class Youtube:
         YOUTUBE_API_KEY (str): ключ для работы с API YouTube
         youtube: клиент для работы с API YouTube
     """
-    load_dotenv()
+
     YOUTUBE_API_KEY = os.environ.get('YOUTUBE_API_KEY')
     youtube = build('youtube', 'v3', developerKey=YOUTUBE_API_KEY)
 
-    @staticmethod
-    def get_chanel(channel_id):
-        channel = Youtube.youtube.channels().list(id=channel_id, part='snippet,statistics').execute()
+    @classmethod
+    def get_chanel(cls, channel_id):
+        channel = cls.youtube.channels().list(id=channel_id, part='snippet,statistics').execute()
         return channel
+
+    @classmethod
+    def get_video(cls, video_id):
+        video = cls.youtube.videos().list(id=video_id, part='snippet,statistics').execute()
+        return video
+
+    @classmethod
+    def get_video_in_playlist(cls, video_id, playlist_id):
+        video_in_playlist = cls.youtube.playlistItems().list(
+            part="snippet", playlistId=playlist_id, videoId=video_id
+        ).execute()
+        return video_in_playlist
 
 
 class Channel:
@@ -133,3 +144,108 @@ class Channel:
         """
         with open(f'{self.__channel_id}.json', 'w', encoding='utf-8') as file:
             json.dump(self.__channel_info, file, indent='\t')
+
+
+class Video:
+    def __init__(self, video_id=None, video_json=None) -> None:
+        """
+       Инициализируется по id видео или по пути к файлу json (для тестирования)
+       Во время создания экземпляра инициализируются атрибуты:
+       - video_info: информация о видео
+       - title: название видео
+       - view_count: количество просмотров
+       - like_count: количество лайков
+       :param video_id: id канала видео
+       :type video_id: str
+       :param video_json: путь к файлу json с информацией о видео
+       :type video_json: str
+       """
+        if video_id is not None:
+            self.__video_info = Youtube.get_video(video_id=video_id)
+        elif video_json is not None:
+            with open(video_json, 'r') as file:
+                data = file.read()
+                self.__video_info = json.loads(data)
+        else:
+            raise Exception('Illegal arguments')
+
+        self.__video_id = video_id
+        self.__title = self.title
+        self.__url = self.url
+        self.__view_count = self.view_count
+        self.__like_count = self.like_count
+
+    def __repr__(self):
+        return f'Video(video_id={self.__video_id})'
+
+    def __str__(self):
+        return self.__title
+
+    @property
+    def title(self) -> str:
+        """Геттер. Возвращает название видео"""
+        video_title = self.__video_info.get('items')[0].get('snippet').get('localized').get('title')
+        return video_title
+
+    @property
+    def url(self) -> str:
+        """Геттер. Возвращает ссылку на видео"""
+        video_id = self.__video_info.get('items')[0].get('id')
+        url = f'https://www.youtube.com/watch?v={video_id}'
+        return url
+
+    @property
+    def view_count(self) -> str:
+        """Геттер. Возвращает количество просмотров"""
+        view_count = self.__video_info.get('items')[0].get('statistics').get('viewCount')
+        return view_count
+
+    @property
+    def like_count(self) -> str:
+        """Геттер. Возвращает количество лайков"""
+        like_count = self.__video_info.get('items')[0].get('statistics').get('likeCount')
+        return like_count
+
+
+class PLVideo(Video):
+    """
+    Класс, описывающий видео в плейлисте.
+    Родительский класс - Video.
+    Инициализируется по id видео или по пути к файлу json (для тестирования)
+    Во время создания экземпляра инициализируются атрибуты:
+    - playlist_info: информация о плейлисте
+    - video_info: информация о видео
+    - title: название видео
+    - view_count: количество просмотров
+    - like_count: количество лайков
+    - id_playlist: если указанное видео есть в указанном плейлисте, то в этот
+    атрибут будет записано id плейлиста
+    :param video_id: id канала видео
+    :type video_id: str
+    :param video_json: путь к файлу json с информацией о видео
+    :type video_json: str
+    :param playlist_id: id плейлиста
+    :type playlist_id: str
+    :param playlist_json: путь к файлу json с информацией о плейлисте
+    :type playlist_json: str
+    """
+
+    def __init__(self, video_id=None, video_json=None, playlist_id=None, playlist_json=None):
+        super().__init__(video_id, video_json)
+        if playlist_id is not None and video_id is not None:
+            self.__playlist_info = Youtube.get_video_in_playlist(video_id=video_id, playlist_id=playlist_id)
+        elif playlist_json is not None and video_json is not None:
+            with open(playlist_json, 'r') as file:
+                data = file.read()
+                self.__playlist_info = json.loads(data)
+        else:
+            raise Exception('Illegal arguments')
+
+        self.__id_playlist = self.id_playlist
+
+    @property
+    def id_playlist(self) -> str:
+        if self.__playlist_info['items']:
+            id_playlist = self.__playlist_info.get('items')[0].get('snippet').get('playlistId')
+            return id_playlist
+        return f'Видео "{self.title}" нет в указанном плейлисте'
