@@ -37,3 +37,14 @@ def test_object_name_str(video_from_youtube):
 def test_object_name_repr(video_from_youtube):
     """Проверка отображения информации об объекте класса Channel для разработчика"""
     assert repr(video_from_youtube) == 'Video(video_id=9lO06Zxhu88)'
+
+
+def test_incorrect_video_id():
+    """Проверка атрибутов и методов, если задан некорректный id видео"""
+    video = Video(video_id='test')
+    assert video.video_id == 'test'
+    assert video.title is None
+    assert video.url is None
+    assert video.view_count is None
+    assert video.like_count is None
+    assert video.duration is None

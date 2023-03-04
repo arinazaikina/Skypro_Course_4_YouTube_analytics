@@ -45,3 +45,13 @@ def test_duration(playlist_from_youtube):
 def test_show_best_video(playlist_from_youtube):
     """Проверка популярного видео в плейлисте"""
     assert playlist_from_youtube.show_best_video() == 'https://www.youtube.com/watch?v=9Bv2zltQKQA'
+
+
+def test_incorrect_playlist_id():
+    """Проверка атрибутов и методов, если задан некорректный id плейлиста"""
+    playlist = PlayList(playlist_id='test')
+    assert playlist.playlist_id == 'test'
+    assert playlist.title is None
+    assert playlist.url is None
+    assert playlist.total_duration == datetime.timedelta(0)
+    assert playlist.show_best_video() is None
