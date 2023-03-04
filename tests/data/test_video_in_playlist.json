@@ -1,10 +1,10 @@
 {
 	"kind": "youtube#videoListResponse",
-	"etag": "XkFme9MsoeZUgsLw-fwuhmkeWQg",
+	"etag": "PbtUspS2wDl_3zJKcBxs1vEPrgw",
 	"items": [
 		{
 			"kind": "youtube#video",
-			"etag": "8lIpQhZOyeAXbvmIVVq6AX_YBLk",
+			"etag": "_b1G8M4sKqZiiMK89pHUfBlii7E",
 			"id": "BBotskuyw_M",
 			"snippet": {
 				"publishedAt": "2022-02-19T06:00:03Z",
@@ -69,9 +69,18 @@
 				},
 				"defaultAudioLanguage": "ru"
 			},
+			"contentDetails": {
+				"duration": "PT1H52M18S",
+				"dimension": "2d",
+				"definition": "hd",
+				"caption": "true",
+				"licensedContent": true,
+				"contentRating": {},
+				"projection": "rectangular"
+			},
 			"statistics": {
-				"viewCount": "506269",
-				"likeCount": "18491",
+				"viewCount": "507414",
+				"likeCount": "18523",
 				"favoriteCount": "0",
 				"commentCount": "974"
 			}
