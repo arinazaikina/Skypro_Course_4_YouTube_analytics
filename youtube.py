@@ -5,6 +5,7 @@ from typing import List
 
 import isodate
 from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
 
 
 class Youtube:
@@ -50,11 +51,14 @@ class Youtube:
         video_ids = []
         params = {'playlistId': playlist_id, 'part': 'snippet,contentDetails', 'maxResults': 50}
         while True:
-            playlists = cls.youtube.playlistItems().list(**params).execute()
-            for item in playlists['items']:
-                video_ids.append(item['snippet']['resourceId'].get('videoId'))
-            params['pageToken'] = playlists.get('nextPageToken')
-            if not params['pageToken']:
+            try:
+                playlists = cls.youtube.playlistItems().list(**params).execute()
+                for item in playlists['items']:
+                    video_ids.append(item['snippet']['resourceId'].get('videoId'))
+                params['pageToken'] = playlists.get('nextPageToken')
+                if not params['pageToken']:
+                    break
+            except HttpError:
                 break
         return video_ids
 
@@ -104,60 +108,83 @@ class Channel:
     def __str__(self) -> str:
         return f'YouTube-канал: {self.__title}'
 
-    def __len__(self) -> int:
+    def __len__(self) -> int | None:
         """Возвращает количество подписчиков"""
-        return self.__subscriber_count
+        if self.__subscriber_count is not None:
+            return self.__subscriber_count
+        return 0
 
-    def __add__(self, other: 'Channel') -> int:
+    def __add__(self, other: 'Channel') -> int | None:
         """Сложение количества подписчиков двух каналов"""
         if not isinstance(other, Channel):
             raise ArithmeticError('Правый операнд должен быть объектом Channel')
+        if self.__subscriber_count is None or other.__subscriber_count is None:
+            return None
         return self.__subscriber_count + other.__subscriber_count
 
-    def __gt__(self, other: 'Channel') -> bool:
+    def __gt__(self, other: 'Channel') -> bool | None:
         """
         Возвращает True, если количество подписчиков на канале больше, чем на другом канале.
         Возвращает False, если количество подписчиков на канале меньше, чем на другом канале.
         """
         if not isinstance(other, Channel):
             raise TypeError('Правый операнд должен быть объектом Channel')
+        if self.__subscriber_count is None or other.__subscriber_count is None:
+            return None
         return self.__subscriber_count > other.__subscriber_count
 
     @property
-    def title(self) -> str:
+    def channel_id(self) -> str | None:
+        """Возвращает id канала"""
+        return self.__channel_id
+
+    @property
+    def title(self) -> str | None:
         """Возвращает название канала"""
-        channel_title = self.__channel_info.get('items')[0].get('snippet').get('title')
-        return channel_title
+        if self.__channel_info.get('items'):
+            channel_title = self.__channel_info.get('items')[0].get('snippet').get('title')
+            return channel_title
+        return None
 
     @property
-    def description(self) -> str:
+    def description(self) -> str | None:
         """Возвращает описание канала"""
-        channel_description = self.__channel_info.get('items')[0].get('snippet').get('description')
-        return channel_description
+        if self.__channel_info.get('items'):
+            channel_description = self.__channel_info.get('items')[0].get('snippet').get('description')
+            return channel_description
+        return None
 
     @property
-    def link(self) -> str:
+    def link(self) -> str | None:
         """Возвращает ссылку на канал"""
-        channel_link = self.__channel_info.get('items')[0].get('snippet').get('customUrl')
-        return channel_link
+        if self.__channel_info.get('items'):
+            channel_link = self.__channel_info.get('items')[0].get('snippet').get('customUrl')
+            return channel_link
+        return None
 
     @property
-    def subscriber_count(self) -> int:
+    def subscriber_count(self) -> int | None:
         """Возвращает количество подписчиков"""
-        channel_subscriber = self.__channel_info.get('items')[0].get('statistics').get('subscriberCount')
-        return int(channel_subscriber)
+        if self.__channel_info.get('items'):
+            channel_subscriber = self.__channel_info.get('items')[0].get('statistics').get('subscriberCount')
+            return int(channel_subscriber)
+        return None
 
     @property
-    def video_count(self) -> int:
+    def video_count(self) -> int | None:
         """Возвращает количество видео"""
-        channel_video = self.__channel_info.get('items')[0].get('statistics').get('videoCount')
-        return int(channel_video)
+        if self.__channel_info.get('items'):
+            channel_video = self.__channel_info.get('items')[0].get('statistics').get('videoCount')
+            return int(channel_video)
+        return None
 
     @property
-    def view_count(self) -> int:
+    def view_count(self) -> int | None:
         """Возвращает количество просмотров"""
-        channel_view = self.__channel_info.get('items')[0].get('statistics').get('viewCount')
-        return int(channel_view)
+        if self.__channel_info.get('items'):
+            channel_view = self.__channel_info.get('items')[0].get('statistics').get('viewCount')
+            return int(channel_view)
+        return None
 
     def print_info(self) -> None:
         """Выводит на экран информацию о канале"""
@@ -214,36 +241,51 @@ class Video:
         return self.__title
 
     @property
-    def title(self) -> str:
+    def video_id(self) -> str:
+        """Возвращает id видео"""
+        return self.__video_id
+
+    @property
+    def title(self) -> str | None:
         """Геттер. Возвращает название видео"""
-        video_title = self.__video_info.get('items')[0].get('snippet').get('localized').get('title')
-        return video_title
+        if self.__video_info.get('items'):
+            video_title = self.__video_info.get('items')[0].get('snippet').get('localized').get('title')
+            return video_title
+        return None
 
     @property
-    def url(self) -> str:
+    def url(self) -> str | None:
         """Геттер. Возвращает ссылку на видео"""
-        video_id = self.__video_info.get('items')[0].get('id')
-        url = f'https://www.youtube.com/watch?v={video_id}'
-        return url
+        if self.__video_info.get('items'):
+            video_id = self.__video_info.get('items')[0].get('id')
+            url = f'https://www.youtube.com/watch?v={video_id}'
+            return url
+        return None
 
     @property
-    def view_count(self) -> int:
+    def view_count(self) -> int | None:
         """Геттер. Возвращает количество просмотров"""
-        view_count = self.__video_info.get('items')[0].get('statistics').get('viewCount')
-        return int(view_count)
+        if self.__video_info.get('items'):
+            view_count = self.__video_info.get('items')[0].get('statistics').get('viewCount')
+            return int(view_count)
+        return None
 
     @property
-    def like_count(self) -> int:
+    def like_count(self) -> int | None:
         """Геттер. Возвращает количество лайков"""
-        like_count = self.__video_info.get('items')[0].get('statistics').get('likeCount')
-        return int(like_count)
+        if self.__video_info.get('items'):
+            like_count = self.__video_info.get('items')[0].get('statistics').get('likeCount')
+            return int(like_count)
+        return None
 
     @property
-    def duration(self) -> str:
+    def duration(self) -> str | None:
         """Геттер. Возвращает длительность видео"""
-        iso_8601_duration = self.__video_info.get('items')[0].get('contentDetails').get('duration')
-        duration = isodate.parse_duration(iso_8601_duration)
-        return duration
+        if self.__video_info.get('items'):
+            iso_8601_duration = self.__video_info.get('items')[0].get('contentDetails').get('duration')
+            duration = isodate.parse_duration(iso_8601_duration)
+            return duration
+        return None
 
 
 class PLVideo(Video):
@@ -335,16 +377,25 @@ class PlayList:
         return f'YouTube-плейлист: {self.__title}'
 
     @property
-    def title(self) -> str:
-        """Геттер. Возвращает название плейлиста"""
-        playlist_title = self.__playlist_info.get('items')[0].get('snippet').get('title')
-        return playlist_title
+    def playlist_id(self):
+        """Возвращает id плейлиста"""
+        return self.__playlist_id
 
     @property
-    def url(self) -> str:
+    def title(self) -> str | None:
+        """Геттер. Возвращает название плейлиста"""
+        if self.__playlist_info.get('items'):
+            playlist_title = self.__playlist_info.get('items')[0].get('snippet').get('title')
+            return playlist_title
+        return None
+
+    @property
+    def url(self) -> str | None:
         """Геттер. Возвращает ссылку на плейлист"""
-        url = f'https://www.youtube.com/playlist?list={self.__playlist_id}'
-        return url
+        if self.__playlist_info.get('items'):
+            url = f'https://www.youtube.com/playlist?list={self.__playlist_id}'
+            return url
+        return None
 
     @property
     def total_duration(self) -> datetime.timedelta:
