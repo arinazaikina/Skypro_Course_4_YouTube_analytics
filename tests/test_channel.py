@@ -88,3 +88,18 @@ def test_gt_exception(channel_1_from_json):
     """
     with pytest.raises(TypeError):
         result = channel_1_from_json > 10
+
+
+def test_incorrect_id_channel(channel_1_from_json):
+    """Проверка атрибутов и методов, если задан некорректный id канала"""
+    channel = Channel(channel_id='test')
+    assert channel.channel_id == 'test'
+    assert channel.title is None
+    assert channel.description is None
+    assert channel.link is None
+    assert channel.subscriber_count is None
+    assert channel.video_count is None
+    assert channel.view_count is None
+    assert len(channel) == 0
+    assert channel + channel_1_from_json is None
+    assert (channel < channel_1_from_json) is None
